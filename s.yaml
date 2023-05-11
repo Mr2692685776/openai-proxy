@@ -1,0 +1,51 @@
+edition: 1.0.0 #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
+name: openai-proxy-s1yr
+access: default #  秘钥别名
+
+services:
+  function-test: #  服务名称
+    component: fc # 组件名称
+    props: #  组件的属性值
+      region: us-west-1
+      # region: "us-west-1" # 来自 publish.yaml Parameters 参数定义, 更多关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
+      service:
+        name: openai-proxy
+        description: 欢迎使用openai-proxy
+      function:
+        name: openai-proxy
+        description: openai-proxy
+        codeUri: ./code
+        cpu: 0.05
+        memorySize: 128
+        diskSize: 512
+        runtime: custom
+        caPort: 9000
+        timeout: 30
+        #        environmentVariables:
+        #          openAiSecret: '${env.openAiSecret}'
+        customRuntimeConfig:
+          command:
+            - node
+            - app.js
+      triggers: # 触发器配置
+        - name: httpTrigger # 触发器名称
+          type: http # 触发器类型
+          config: # 触发器配置，包括OSS触发器, Log触发器, Log触发器, Timer触发器, Http触发器, MNS触发器, CDN触发器
+            authType: anonymous # 鉴权类型，可选值：anonymous、function
+            disableURLInternet: false # 是否禁用公网访问 URL
+            methods: # HTTP 触发器支持的访问方法，可选值：GET、POST、PUT、DELETE、HEAD
+              - GET
+              - POST
+              - PUT
+              - DELETE
+
+      customDomains:
+        - domainName: auto
+          protocol: HTTP
+          routeConfigs:
+            - path: '/*'
+              methods:
+                - GET
+                - POST
+                - PUT
+                - DELETE
